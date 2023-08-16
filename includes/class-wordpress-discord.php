@@ -1,4 +1,10 @@
 <?php
+/**
+ * Master plugin class for the Discord integration plugin.
+ *
+ * @link https://github.com/XerShade/XerShade.WordPress.Discord
+ * @package XerShade.WordPress.Discord
+ */
 
 /**
  * Master plugin class for the Discord integration plugin.
@@ -22,6 +28,12 @@ class WordPress_Discord {
 	 * @var string $discord_redirect_uri
 	 */
 	protected $discord_redirect_uri;
+	/**
+	 * Tells the plugin if it should enable OAuth related features.
+	 *
+	 * @var bool $discord_enable_oauth
+	 */
+	protected $discord_enable_oauth;
 
 	/**
 	 * Constructs the plugin class and loads configuration settings.
@@ -30,6 +42,7 @@ class WordPress_Discord {
 		$this->discord_client_id     = get_option( 'discord_client_id' );
 		$this->discord_client_secret = get_option( 'discord_client_secret' );
 		$this->discord_redirect_uri  = get_option( 'discord_redirect_uri', '/wp-admin/admin-ajax.php?action=discord_oauth_callback' );
+		$this->discord_enable_oauth  = get_option( 'discord_enable_oauth', false );
 
 		// Register WordPress hooks.
 		add_action( 'login_form', array( $this, 'discord_oauth_login_button' ) );
@@ -47,6 +60,9 @@ class WordPress_Discord {
 	 * @return void
 	 */
 	public function discord_oauth_login_button() {
+		if ( ! $this->discord_enable_oauth ) {
+			return; }
+
 		$discord_login_url = 'https://discord.com/oauth2/authorize?client_id=' . $this->discord_client_id . '&redirect_uri=' . rawurlencode( $this->discord_redirect_uri ) . '&response_type=code&scope=identify email';
 		echo '<p id="discord-login-button"><a class="button" style="margin: 0 6px 16px 0; width: 100%; text-align: center;" href="' . esc_url( $discord_login_url ) . '">Log in with Discord</a></p>';
 	}
@@ -64,7 +80,7 @@ class WordPress_Discord {
 				'client_id'     => $this->discord_client_id,
 				'client_secret' => $this->discord_client_secret,
 				'grant_type'    => 'authorization_code',
-				'code'          => sanitize_text_field( $_GET['code'] ),
+				'code'          => sanitize_text_field( wp_unslash( $_GET['code'] ) ),
 				'redirect_uri'  => $this->discord_redirect_uri,
 				'scope'         => 'identify email',
 			);
@@ -180,10 +196,13 @@ class WordPress_Discord {
 				$this->discord_redirect_uri = sanitize_text_field( wp_unslash( $_POST['discord_redirect_uri'] ) );
 				update_option( 'discord_redirect_uri', $this->discord_redirect_uri );
 			}
+
+			$this->discord_enable_oauth = isset( $_POST['discord_enable_oauth'] ) ? true : false;
+			update_option( 'discord_enable_oauth', $this->discord_enable_oauth );
 		}
 		?>
 		<div class="wrap">
-			<h2>Discord OAuth Settings</h2>
+			<h2>Discord Settings</h2>
 			<form method="post" action="">
 				<?php
 					wp_nonce_field( 'discord_oauth_nonce', 'discord_oauth_nonce' );
@@ -201,6 +220,17 @@ class WordPress_Discord {
 							<input type="hidden" name="discord_client_secret" id="discord_client_secret" value="<?php echo esc_attr( $this->discord_client_secret ); ?>" class="regular-text">
 							<b>Currently streaming, you wish you could see this on YouTube!</b><br />
 							This will be removed and replaced with a normal text box when I am done steaming.
+						</td>
+					</tr>
+				</table>
+
+				<h2>Discord OAuth Settings</h2>
+				<table class="form-table">
+					<tr>
+						<th scope="row"><label for="discord_enable_oauth">Enable Discord OAuth</label></th>
+						<td>
+							<input type="checkbox" name="discord_enable_oauth" id="discord_enable_oauth" <?php checked( $this->discord_enable_oauth, true ); ?>>
+							<label for="discord_enable_oauth">Enable Discord OAuth authentication.</label>
 						</td>
 					</tr>
 					<tr>
@@ -227,7 +257,7 @@ class WordPress_Discord {
 			}
 		}
 
-		if ( get_user_meta( $user->ID, 'discord_id', true ) ) {
+		if ( $this->discord_enable_oauth && get_user_meta( $user->ID, 'discord_id', true ) ) {
 			?>
 			<h3>Unlink Discord Account</h3>
 			<table class="form-table">
@@ -241,7 +271,7 @@ class WordPress_Discord {
 			</table>
 			<?php
 		} else {
-			if ( $this->discord_client_id && $this->discord_redirect_uri ) {
+			if ( $this->discord_enable_oauth && $this->discord_client_id && $this->discord_redirect_uri ) {
 				$discord_authorize_url = "https://discord.com/oauth2/authorize?client_id={$this->discord_client_id}&redirect_uri=" . urlencode( $this->discord_redirect_uri ) . '&response_type=code&scope=identify email';
 				?>
 			<h3>Link Discord Account</h3>

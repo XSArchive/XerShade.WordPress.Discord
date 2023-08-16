@@ -3,7 +3,7 @@
 /**
  * Master plugin class for the Discord integration plugin.
  */
-class XerShade_WordPress_Discord {
+class WordPress_Discord {
 	/**
 	 * The Discord application's identifier.
 	 *

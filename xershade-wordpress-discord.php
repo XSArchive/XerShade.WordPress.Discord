@@ -153,11 +153,19 @@ function discord_oauth_config_page() {
 			<table class="form-table">
 				<tr>
 					<th scope="row"><label for="discord_client_id">Client ID</label></th>
-					<td><input type="text" name="discord_client_id" id="discord_client_id" value="<?php echo esc_attr( $discord_client_id ); ?>" class="regular-text"></td>
+					<td>
+						<input type="hidden" name="discord_client_id" id="discord_client_id" value="<?php echo esc_attr( $discord_client_id ); ?>" class="regular-text">
+						<b>Currently streaming, you wish you could see this on YouTube!</b><br />
+						This will be removed and replaced with a normal text box when I am done steaming.
+					</td>
 				</tr>
 				<tr>
 					<th scope="row"><label for="discord_client_secret">Client Secret</label></th>
-					<td><input type="text" name="discord_client_secret" id="discord_client_secret" value="<?php echo esc_attr( $discord_client_secret ); ?>" class="regular-text"></td>
+					<td>
+						<input type="hidden" name="discord_client_secret" id="discord_client_secret" value="<?php echo esc_attr( $discord_client_secret ); ?>" class="regular-text">
+						<b>Currently streaming, you wish you could see this on YouTube!</b><br />
+						This will be removed and replaced with a normal text box when I am done steaming.
+					</td>
 				</tr>
 				<tr>
 					<th scope="row"><label for="discord_redirect_uri">Redirect URI</label></th>

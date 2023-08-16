@@ -4,18 +4,41 @@
  * Description: A plugin that adds features that interact with Discord to WordPress.
  * Version: 1.1.0
  * Author: XerShade
+ *
+ * @link https://github.com/XerShade/XerShade.WordPress.Discord
+ * @package XerShade.WordPress.Discord
  */
 
-class XerShade_Discord_Plugin {
+/**
+ * Master plugin class for the Discord integration plugin.
+ */
+class XerShade_WordPress_Discord {
+	/**
+	 * The Discord application's identifier.
+	 *
+	 * @var string $discord_client_id
+	 */
 	protected $discord_client_id;
+	/**
+	 * The Discord application's secret key.
+	 *
+	 * @var string $discord_client_secret
+	 */
 	protected $discord_client_secret;
+	/**
+	 * The redirect uri that Discord sends the user to after authenticating.
+	 *
+	 * @var string $discord_redirect_uri
+	 */
 	protected $discord_redirect_uri;
 
+	/**
+	 * Constructs the plugin class and loads configuration settings.
+	 */
 	public function __construct() {
-		 // Discord OAuth settings
 		$this->discord_client_id     = get_option( 'discord_client_id' );
 		$this->discord_client_secret = get_option( 'discord_client_secret' );
-		$this->discord_redirect_uri  = get_option( 'discord_redirect_uri' );
+		$this->discord_redirect_uri  = get_option( 'discord_redirect_uri', '/wp-admin/admin-ajax.php?action=discord_oauth_callback' );
 
 		// Register WordPress hooks.
 		add_action( 'login_form', array( $this, 'discord_oauth_login_button' ) );
@@ -23,15 +46,25 @@ class XerShade_Discord_Plugin {
 		add_action( 'wp_ajax_nopriv_discord_oauth_callback', array( $this, 'handle_discord_oauth_callback' ) );
 		add_action( 'admin_menu', array( $this, 'discord_oauth_config_menu' ) );
 		add_action( 'wp_ajax_discord_unlink_account', array( $this, 'handle_discord_unlink_account' ) );
-		add_action( 'show_user_profile', array( $this, 'unlink_discord_account_button' ) );
-		add_action( 'edit_user_profile', array( $this, 'unlink_discord_account_button' ) );
+		add_action( 'show_user_profile', array( $this, 'render_discord_user_settings' ) );
+		add_action( 'edit_user_profile', array( $this, 'render_discord_user_settings' ) );
 	}
 
+	/**
+	 * Generates the Discord login button to display on the login form.
+	 *
+	 * @return void
+	 */
 	public function discord_oauth_login_button() {
-		$discord_login_url = 'https://discord.com/oauth2/authorize?client_id=' . $this->discord_client_id . '&redirect_uri=' . urlencode( $this->discord_redirect_uri ) . '&response_type=code&scope=identify email';
+		$discord_login_url = 'https://discord.com/oauth2/authorize?client_id=' . $this->discord_client_id . '&redirect_uri=' . rawurlencode( $this->discord_redirect_uri ) . '&response_type=code&scope=identify email';
 		echo '<p id="discord-login-button"><a class="button" style="margin: 0 6px 16px 0; width: 100%; text-align: center;" href="' . esc_url( $discord_login_url ) . '">Log in with Discord</a></p>';
 	}
 
+	/**
+	 * Handles any callbacks from Discord.
+	 *
+	 * @return void
+	 */
 	public function handle_discord_oauth_callback() {
 
 		if ( isset( $_GET['code'] ) ) {
@@ -40,12 +73,11 @@ class XerShade_Discord_Plugin {
 				'client_id'     => $this->discord_client_id,
 				'client_secret' => $this->discord_client_secret,
 				'grant_type'    => 'authorization_code',
-				'code'          => $_GET['code'],
+				'code'          => sanitize_text_field( $_GET['code'] ),
 				'redirect_uri'  => $this->discord_redirect_uri,
 				'scope'         => 'identify email',
 			);
 
-			// Get access token
 			$response   = wp_safe_remote_post( $token_url, array( 'body' => $token_data ) );
 			$body       = wp_remote_retrieve_body( $response );
 			$token_info = json_decode( $body, true );
@@ -56,49 +88,39 @@ class XerShade_Discord_Plugin {
 					'Authorization' => 'Bearer ' . $token_info['access_token'],
 				);
 
-				// Get user's Discord profile
 				$user_response = wp_safe_remote_get( $user_info_url, array( 'headers' => $headers ) );
 				$user_body     = wp_remote_retrieve_body( $user_response );
 				$user_info     = json_decode( $user_body, true );
 
-				// Check if the user exists in WordPress
 				$user_id = $this->get_user_id_by_discord_id( $user_info['id'] );
 
 				if ( $user_id ) {
-					// User is already linked, log them in
 					wp_set_auth_cookie( $user_id );
 				} else {
-					// Check if the user is logged in
 					if ( is_user_logged_in() ) {
-						// Link Discord ID to user's meta
 						update_user_meta( get_current_user_id(), 'discord_id', $user_info['id'] );
 					} else {
-						// New user, create a WordPress account
 						$username = sanitize_user( $user_info['username'] );
 						$email    = sanitize_email( $user_info['email'] );
 						$user_id  = wp_create_user( $username, wp_generate_password(), $email );
 
-						// Link Discord ID to user's meta
 						update_user_meta( $user_id, 'discord_id', $user_info['id'] );
 
-						// Log in the newly created user
 						wp_set_auth_cookie( $user_id );
 					}
 				}
 			}
 		}
 
-		// Handle error case
-		if ( isset( $_GET['redirect_to'] ) ) {
-			$redirect_to = esc_url_raw( wp_unslash( $_GET['redirect_to'] ) );
-			wp_safe_redirect( $redirect_to );
-		} else {
-			wp_safe_redirect( home_url() );
-		}
+		wp_safe_redirect( home_url() );
 		exit;
 	}
 
-	// Handle account unlinking
+	/**
+	 * Handles any requests from the user to unlink their Discord account.
+	 *
+	 * @return void
+	 */
 	public function handle_discord_unlink_account() {
 		if ( is_user_logged_in() ) {
 			delete_user_meta( get_current_user_id(), 'discord_id' );
@@ -107,7 +129,12 @@ class XerShade_Discord_Plugin {
 		}
 	}
 
-	// Helper function to get user ID by Discord ID
+	/**
+	 * Returns the WordPress identifier linked to the associated Discord identifier.
+	 *
+	 * @param string $discord_id The Discord identifier to search for.
+	 * @return string The WordPress identifier, or 0 if no linked account is found.
+	 */
 	public function get_user_id_by_discord_id( $discord_id ) {
 		$users = get_users(
 			array(
@@ -120,47 +147,61 @@ class XerShade_Discord_Plugin {
 		return ! empty( $users ) ? $users[0]->ID : 0;
 	}
 
-	// Add the configuration menu item to the admin menu
+	/**
+	 * Adds the configuration page link to the WordPress admin area menu.
+	 *
+	 * @return void
+	 */
 	public function discord_oauth_config_menu() {
 		add_menu_page(
 			'Discord OAuth Settings',
 			'Discord OAuth',
 			'manage_options',
-			'discord-oauth-settings', // Use a different slug to avoid conflicts
+			'discord-oauth-settings',
 			array( $this, 'discord_oauth_config_page' ),
 			'dashicons-shield',
 			30
 		);
 	}
 
-	// Render the configuration page
+	/**
+	 * Renders the configuration page for the plugin.
+	 *
+	 * @return void
+	 */
 	public function discord_oauth_config_page() {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			return;
 		}
 
-		// Save settings when the form is submitted
-		if ( isset( $_POST['discord_oauth_submit'] ) ) {
-			update_option( 'discord_client_id', sanitize_text_field( $_POST['discord_client_id'] ) );
-			update_option( 'discord_client_secret', sanitize_text_field( $_POST['discord_client_secret'] ) );
-			update_option( 'discord_redirect_uri', sanitize_text_field( $_POST['discord_redirect_uri'] ) );
-		}
+		if ( isset( $_POST['discord_oauth_submit'] ) && isset( $_POST['discord_oauth_nonce'] ) && wp_verify_nonce( sanitize_key( $_POST['discord_oauth_nonce'] ), 'discord_oauth_nonce' ) ) {
+			if ( isset( $_POST['discord_client_id'] ) ) {
+				$this->discord_client_id = sanitize_text_field( wp_unslash( $_POST['discord_client_id'] ) );
+				update_option( 'discord_client_id', $this->discord_client_id );
+			}
 
-		// Update the class' stored values.
-		$this->discord_client_id     = get_option( 'discord_client_id', '' );
-		$this->discord_client_secret = get_option( 'discord_client_secret', '' );
-		$this->discord_redirect_uri  = get_option( 'discord_redirect_uri', site_url( '/wp-admin/admin-ajax.php?action=discord_oauth_callback' ) );
+			if ( isset( $_POST['discord_client_secret'] ) ) {
+				$this->discord_client_secret = sanitize_text_field( wp_unslash( $_POST['discord_client_secret'] ) );
+				update_option( 'discord_client_secret', $this->discord_client_secret );
+			}
+
+			if ( isset( $_POST['discord_redirect_uri'] ) ) {
+				$this->discord_redirect_uri = sanitize_text_field( wp_unslash( $_POST['discord_redirect_uri'] ) );
+				update_option( 'discord_redirect_uri', $this->discord_redirect_uri );
+			}
+		}
 		?>
 		<div class="wrap">
 			<h2>Discord OAuth Settings</h2>
 			<form method="post" action="">
+				<?php
+					wp_nonce_field( 'discord_oauth_nonce', 'discord_oauth_nonce' );
+				?>
 				<table class="form-table">
 					<tr>
 						<th scope="row"><label for="discord_client_id">Client ID</label></th>
 						<td>
-							<input type="hidden" name="discord_client_id" id="discord_client_id" value="<?php echo esc_attr( $this->discord_client_id ); ?>" class="regular-text">
-							<b>Currently streaming, you wish you could see this on YouTube!</b><br />
-							This will be removed and replaced with a normal text box when I am done steaming.
+							<input type="text" name="discord_client_id" id="discord_client_id" value="<?php echo esc_attr( $this->discord_client_id ); ?>" class="regular-text">
 						</td>
 					</tr>
 					<tr>
@@ -182,10 +223,15 @@ class XerShade_Discord_Plugin {
 		<?php
 	}
 
-	// Add Unlink Account button to user profile
-	public function unlink_discord_account_button( $user ) {
+	/**
+	 * Renders the plugin settings on the user's profile page.
+	 *
+	 * @param WP_User $user The current WP_User object.
+	 * @return void
+	 */
+	public function render_discord_user_settings( $user ) {
 		if ( get_user_meta( $user->ID, 'discord_id', true ) ) {
-			if ( current_user_can( 'edit_user', $user->ID ) && isset( $_GET['unlink_discord'] ) && $_GET['unlink_discord'] == $user->ID ) {
+			if ( current_user_can( 'edit_user', $user->ID ) && isset( $_GET['unlink_discord'] ) && intval( sanitize_text_field( $_GET['unlink_discord'] ) ) === $user->ID ) {
 				delete_user_meta( $user->ID, 'discord_id' );
 			}
 		}
@@ -223,4 +269,4 @@ class XerShade_Discord_Plugin {
 	}
 }
 
-$xershade_discord_plugin = new XerShade_Discord_Plugin();
+$xershade_wordpress_discord = new XerShade_WordPress_Discord();

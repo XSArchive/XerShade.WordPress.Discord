@@ -231,7 +231,7 @@ class XerShade_WordPress_Discord {
 	 */
 	public function render_discord_user_settings( $user ) {
 		if ( get_user_meta( $user->ID, 'discord_id', true ) ) {
-			if ( current_user_can( 'edit_user', $user->ID ) && isset( $_GET['unlink_discord'] ) && intval( sanitize_text_field( $_GET['unlink_discord'] ) ) === $user->ID ) {
+			if ( current_user_can( 'edit_user', $user->ID ) && isset( $_GET['unlink_discord'] ) && intval( sanitize_text_field( wp_unslash( $_GET['unlink_discord'] ) ) ) === $user->ID ) {
 				delete_user_meta( $user->ID, 'discord_id' );
 			}
 		}

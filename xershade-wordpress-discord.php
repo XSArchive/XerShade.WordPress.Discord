@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin Name: XerShade's OAuth (Discord)
- * Description: A simple OAuth plugin for WordPress that allows users to login and create new accounts with discord.
- * Version: 1.0.0
+ * Plugin Name: XerShade's Discord Plugin
+ * Description: A plugin that adds features that interact with Discord to WordPress.
+ * Version: 1.1.0
  * Author: XerShade
  */
 
@@ -98,7 +98,7 @@ add_action( 'wp_ajax_discord_unlink_account', 'handle_discord_unlink_account' );
 function handle_discord_unlink_account() {
 	if ( is_user_logged_in() ) {
 		delete_user_meta( get_current_user_id(), 'discord_id' );
-		wp_redirect( home_url() );
+		wp_safe_redirect( home_url() );
 		exit;
 	}
 }

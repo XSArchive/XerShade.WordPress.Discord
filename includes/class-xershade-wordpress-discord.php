@@ -1,13 +1,4 @@
 <?php
-/**
- * Plugin Name: XerShade's Discord Plugin
- * Description: A plugin that adds features that interact with Discord to WordPress.
- * Version: 1.1.0
- * Author: XerShade
- *
- * @link https://github.com/XerShade/XerShade.WordPress.Discord
- * @package XerShade.WordPress.Discord
- */
 
 /**
  * Master plugin class for the Discord integration plugin.
@@ -268,5 +259,3 @@ class XerShade_WordPress_Discord {
 		}
 	}
 }
-
-$xershade_wordpress_discord = new XerShade_WordPress_Discord();

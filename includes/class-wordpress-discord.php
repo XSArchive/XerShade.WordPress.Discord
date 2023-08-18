@@ -6,6 +6,8 @@
  * @package XerShade.WordPress.Discord
  */
 
+namespace XerShade\WordPress\Discord;
+
 /**
  * Master plugin class for the Discord integration plugin.
  */

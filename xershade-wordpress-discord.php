@@ -9,6 +9,8 @@
  * @package XerShade.WordPress.Discord
  */
 
+use XerShade\WordPress\Discord\WordPress_Discord;
+
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-wordpress-discord.php';
 
 $xershade_wordpress_discord = new WordPress_Discord();

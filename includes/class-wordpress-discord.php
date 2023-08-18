@@ -9,13 +9,15 @@
 namespace XerShade\WordPress\Discord;
 
 require_once plugin_dir_path( __FILE__ ) . 'class-discord-oauth.php';
+require_once plugin_dir_path( __FILE__ ) . 'class-wordpress-plugin.php';
 
 use XerShade\Discord\OAuth\Discord_OAuth;
+use XerShade\WordPress\WordPress_Plugin;
 
 /**
  * Master plugin class for the Discord integration plugin.
  */
-class WordPress_Discord {
+class WordPress_Discord extends WordPress_Plugin {
 	/**
 	 * The Discord application's identifier.
 	 *

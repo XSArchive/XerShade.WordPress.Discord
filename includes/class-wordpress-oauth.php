@@ -8,9 +8,9 @@
 
 namespace XerShade\WordPress\OAuth;
 
-use XerShade\WordPress\Discord\WordPress_Discord;
+use XerShade\WordPress\WordPress_Plugin;
 
-require_once plugin_dir_path( __FILE__ ) . 'class-wordpress-discord.php';
+require_once plugin_dir_path( __FILE__ ) . 'class-wordpress-plugin.php';
 
 if ( ! class_exists( 'XerShade\WordPress\OAuth\WordPress_OAuth' ) ) {
 	/**
@@ -57,10 +57,10 @@ if ( ! class_exists( 'XerShade\WordPress\OAuth\WordPress_OAuth' ) ) {
 		/**
 		 * Undocumented function
 		 *
-		 * @param string            $service The name of the service that this OAuth client connects to.
-		 * @param WordPress_Discord $parent The parent class that owns this OAuth class.
+		 * @param string           $service The name of the service that this OAuth client connects to.
+		 * @param WordPress_Plugin $parent The parent class that owns this OAuth class.
 		 */
-		public function __construct( string $service, WordPress_Discord $parent ) {
+		public function __construct( string $service, WordPress_Plugin $parent ) {
 			$this->service       = sanitize_key( $service );
 			$this->parent        = $parent;
 			$this->client_id     = get_option( $this->service . '_oauth_client_id', '' );

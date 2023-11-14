@@ -7,7 +7,7 @@
  * public-facing side of the site and the admin area.
  *
  * @link       https://www.xershade.ca
- * @since      1.0.0
+ * @since      1.2.0
  *
  * @package    Xershade_Discord_Integration
  * @subpackage Xershade_Discord_Integration/includes
@@ -22,7 +22,7 @@
  * Also maintains the unique identifier of this plugin as well as the current
  * version of the plugin.
  *
- * @since      1.0.0
+ * @since      1.2.0
  * @package    Xershade_Discord_Integration
  * @subpackage Xershade_Discord_Integration/includes
  * @author     XerShade <xershade.ca@gmail.com>
@@ -33,7 +33,7 @@ class Xershade_Discord_Integration {
 	 * The loader that's responsible for maintaining and registering all hooks that power
 	 * the plugin.
 	 *
-	 * @since    1.0.0
+	 * @since    1.2.0
 	 * @access   protected
 	 * @var      Xershade_Discord_Integration_Loader    $loader    Maintains and registers all hooks for the plugin.
 	 */
@@ -42,7 +42,7 @@ class Xershade_Discord_Integration {
 	/**
 	 * The unique identifier of this plugin.
 	 *
-	 * @since    1.0.0
+	 * @since    1.2.0
 	 * @access   protected
 	 * @var      string    $plugin_name    The string used to uniquely identify this plugin.
 	 */
@@ -51,7 +51,7 @@ class Xershade_Discord_Integration {
 	/**
 	 * The current version of the plugin.
 	 *
-	 * @since    1.0.0
+	 * @since    1.2.0
 	 * @access   protected
 	 * @var      string    $version    The current version of the plugin.
 	 */
@@ -64,13 +64,13 @@ class Xershade_Discord_Integration {
 	 * Load the dependencies, define the locale, and set the hooks for the admin area and
 	 * the public-facing side of the site.
 	 *
-	 * @since    1.0.0
+	 * @since    1.2.0
 	 */
 	public function __construct() {
 		if ( defined( 'XERSHADE_DISCORD_INTEGRATION_VERSION' ) ) {
 			$this->version = XERSHADE_DISCORD_INTEGRATION_VERSION;
 		} else {
-			$this->version = '1.0.0';
+			$this->version = '1.2.0';
 		}
 		$this->plugin_name = 'xershade-discord-integration';
 
@@ -94,7 +94,7 @@ class Xershade_Discord_Integration {
 	 * Create an instance of the loader which will be used to register the hooks
 	 * with WordPress.
 	 *
-	 * @since    1.0.0
+	 * @since    1.2.0
 	 * @access   private
 	 */
 	private function load_dependencies() {
@@ -132,7 +132,7 @@ class Xershade_Discord_Integration {
 	 * Uses the Xershade_Discord_Integration_i18n class in order to set the domain and to register the hook
 	 * with WordPress.
 	 *
-	 * @since    1.0.0
+	 * @since    1.2.0
 	 * @access   private
 	 */
 	private function set_locale() {
@@ -147,7 +147,7 @@ class Xershade_Discord_Integration {
 	 * Register all of the hooks related to the admin area functionality
 	 * of the plugin.
 	 *
-	 * @since    1.0.0
+	 * @since    1.2.0
 	 * @access   private
 	 */
 	private function define_admin_hooks() {
@@ -163,7 +163,7 @@ class Xershade_Discord_Integration {
 	 * Register all of the hooks related to the public-facing functionality
 	 * of the plugin.
 	 *
-	 * @since    1.0.0
+	 * @since    1.2.0
 	 * @access   private
 	 */
 	private function define_public_hooks() {
@@ -178,7 +178,7 @@ class Xershade_Discord_Integration {
 	/**
 	 * Run the loader to execute all of the hooks with WordPress.
 	 *
-	 * @since    1.0.0
+	 * @since    1.2.0
 	 */
 	public function run() {
 		$this->loader->run();
@@ -188,7 +188,7 @@ class Xershade_Discord_Integration {
 	 * The name of the plugin used to uniquely identify it within the context of
 	 * WordPress and to define internationalization functionality.
 	 *
-	 * @since     1.0.0
+	 * @since     1.2.0
 	 * @return    string    The name of the plugin.
 	 */
 	public function get_plugin_name() {
@@ -198,7 +198,7 @@ class Xershade_Discord_Integration {
 	/**
 	 * The reference to the class that orchestrates the hooks with the plugin.
 	 *
-	 * @since     1.0.0
+	 * @since     1.2.0
 	 * @return    Xershade_Discord_Integration_Loader    Orchestrates the hooks of the plugin.
 	 */
 	public function get_loader() {
@@ -208,7 +208,7 @@ class Xershade_Discord_Integration {
 	/**
 	 * Retrieve the version number of the plugin.
 	 *
-	 * @since     1.0.0
+	 * @since     1.2.0
 	 * @return    string    The version number of the plugin.
 	 */
 	public function get_version() {

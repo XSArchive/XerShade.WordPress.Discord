@@ -9,14 +9,14 @@
  * that starts the plugin.
  *
  * @link              https://www.xershade.ca
- * @since             1.0.0
+ * @since             1.2.0
  * @package           Xershade_Discord_Integration
  *
  * @wordpress-plugin
  * Plugin Name:       XerShade's Discord Integration
  * Plugin URI:        https://github.com/XerShade/XerShade.WordPress.Discord
  * Description:       Integrates Discord into WordPress and allows for features like OAuth authentication, user role mapping, and post linking.
- * Version:           1.0.0
+ * Version:           1.2.0
  * Author:            XerShade
  * Author URI:        https://www.xershade.ca/
  * License:           GPL-2.0+
@@ -32,10 +32,10 @@ if ( ! defined( 'WPINC' ) ) {
 
 /**
  * Currently plugin version.
- * Start at version 1.0.0 and use SemVer - https://semver.org
+ * Start at version 1.2.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define( 'XERSHADE_DISCORD_INTEGRATION_VERSION', '1.0.0' );
+define( 'XERSHADE_DISCORD_INTEGRATION_VERSION', '1.2.0' );
 
 /**
  * The code that runs during plugin activation.
@@ -71,7 +71,7 @@ require plugin_dir_path( __FILE__ ) . 'includes/class-xershade-discord-integrati
  * then kicking off the plugin from this point in the file does
  * not affect the page life cycle.
  *
- * @since    1.0.0
+ * @since    1.2.0
  */
 function run_xershade_discord_integration() {
 

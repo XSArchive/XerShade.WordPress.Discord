@@ -20,7 +20,7 @@
  * https://github.com/tommcfarlin/WordPress-Plugin-Boilerplate/pull/123#issuecomment-28541913
  *
  * @link       https://www.xershade.ca
- * @since      1.0.0
+ * @since      1.2.0
  *
  * @package    Xershade_Discord_Integration
  */

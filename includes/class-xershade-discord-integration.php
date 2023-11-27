@@ -112,6 +112,12 @@ class Xershade_Discord_Integration {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-xershade-discord-integration-i18n.php';
 
 		/**
+		 * The class responsible for defining the Discord OAuth functionality
+		 * of the plugin.
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-xershade-oauth-discord.php';
+
+		/**
 		 * The class responsible for defining all actions that occur in the admin area.
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-xershade-discord-integration-admin.php';
@@ -173,6 +179,16 @@ class Xershade_Discord_Integration {
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
 
+		$plugin_oauth = new DiscordOAuth(); // '530045250878570508', '7tKG-e9AfloOBWT0on3ymO4M6OwsvTdS'
+
+		$this->loader->add_action( 'init', $plugin_oauth, 'handle_oauth_callback' );
+		$this->loader->add_action( 'init', $plugin_oauth, 'handle_oauth_linking' );
+		$this->loader->add_action( 'login_form', $plugin_oauth, 'add_login_button' );
+		$this->loader->add_action( 'show_user_profile', $plugin_oauth, 'add_oauth_user_settings' );
+		$this->loader->add_action( 'edit_user_profile', $plugin_oauth, 'add_oauth_user_settings' );
+		$this->loader->add_action( 'admin_menu', $plugin_oauth, 'add_settings_page');
+		$this->loader->add_action( 'admin_init', $plugin_oauth, 'oauth_register_settings');
+		
 	}
 
 	/**

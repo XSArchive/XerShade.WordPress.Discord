@@ -26,6 +26,8 @@
  */
 
 class OAuthBase {
+    protected $service;
+    protected $service_slug;
     protected $client_id;
     protected $client_secret;
     protected $redirect_uri;

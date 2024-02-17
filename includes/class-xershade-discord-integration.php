@@ -179,7 +179,7 @@ class Xershade_Discord_Integration {
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
 
-		$plugin_oauth = new DiscordOAuth(); // '530045250878570508', '7tKG-e9AfloOBWT0on3ymO4M6OwsvTdS'
+		$plugin_oauth = new DiscordOAuth();
 
 		$this->loader->add_action( 'init', $plugin_oauth, 'handle_oauth_callback' );
 		$this->loader->add_action( 'init', $plugin_oauth, 'handle_oauth_linking' );
